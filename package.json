@@ -1,0 +1,28 @@
+{
+  "name": "aliyun-product-js-sdk",
+  "version": "1.0.0",
+  "description": "aliyun third party product",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/xiaohesong/aliyun-product-js-sdk.git"
+  },
+  "keywords": [
+    "aliyun",
+    "ocr",
+    "or",
+    "other",
+    "third",
+    "party",
+    "product"
+  ],
+  "author": "xiaohesong",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/xiaohesong/aliyun-product-js-sdk/issues"
+  },
+  "homepage": "https://github.com/xiaohesong/aliyun-product-js-sdk#readme"
+}
