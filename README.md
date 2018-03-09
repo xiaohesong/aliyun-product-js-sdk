@@ -24,3 +24,14 @@ client.post(url,{
   }
 })
 ```
+
+- support http method
+  - `get`
+  - `post`
+  - `put`
+  - `delete`
+  
+  
+  
+- not work
+ this package was work in my project. if not work for you, please open a issue. 
