@@ -1,6 +1,6 @@
 {
   "name": "aliyun-product-js-sdk",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "aliyun third party product",
   "main": "index.js",
   "scripts": {
