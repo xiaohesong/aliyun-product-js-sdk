@@ -1,10 +1,19 @@
 {
   "name": "aliyun-product-js-sdk",
-  "version": "1.0.2",
+  "version": "1.0.8",
   "description": "aliyun third party product",
-  "main": "index.js",
+  "main": "dist/aliyun-product.min.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "cross-env BABEL_ENV=commonjs mocha --compilers js:babel-core/register --reporter spec test/*.js",
+    "clean": "rimraf lib dist es",
+    "build": "npm run build:umd && npm run build:umd:min",
+    "prepublish": "npm run build",
+    "posttest": "npm run lint",
+    "lint": "eslint src test",
+    "build:commonjs": "cross-env BABEL_ENV=commonjs babel src --out-dir lib",
+    "build:es": "cross-env BABEL_ENV=es babel src --out-dir es",
+    "build:umd": "cross-env BABEL_ENV=commonjs NODE_ENV=development webpack",
+    "build:umd:min": "cross-env BABEL_ENV=commonjs NODE_ENV=production webpack"
   },
   "repository": {
     "type": "git",
@@ -24,5 +33,18 @@
   "bugs": {
     "url": "https://github.com/xiaohesong/aliyun-product-js-sdk/issues"
   },
-  "homepage": "https://github.com/xiaohesong/aliyun-product-js-sdk#readme"
+  "homepage": "https://github.com/xiaohesong/aliyun-product-js-sdk#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.4",
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1"
+  },
+  "dependencies": {
+    "babel-cli": "^6.6.5",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "cross-env": "^5.1.3",
+    "webpack": "^3.8.1"
+  }
 }

@@ -1,3 +1,3 @@
-import Client from './lib/es5/Client'
+import Client from './lib/Client'
 
 export default Client
