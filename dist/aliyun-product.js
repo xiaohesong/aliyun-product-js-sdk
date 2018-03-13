@@ -6754,6 +6754,78 @@ module.exports = {
 
 /***/ }),
 /* 37 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var META = __webpack_require__(42)('meta');
+var isObject = __webpack_require__(5);
+var has = __webpack_require__(16);
+var setDesc = __webpack_require__(10).f;
+var id = 0;
+var isExtensible = Object.isExtensible || function () {
+  return true;
+};
+var FREEZE = !__webpack_require__(4)(function () {
+  return isExtensible(Object.preventExtensions({}));
+});
+var setMeta = function (it) {
+  setDesc(it, META, { value: {
+    i: 'O' + ++id, // object ID
+    w: {}          // weak collections IDs
+  } });
+};
+var fastKey = function (it, create) {
+  // return primitive with prefix
+  if (!isObject(it)) return typeof it == 'symbol' ? it : (typeof it == 'string' ? 'S' : 'P') + it;
+  if (!has(it, META)) {
+    // can't set metadata to uncaught frozen object
+    if (!isExtensible(it)) return 'F';
+    // not necessary to add metadata
+    if (!create) return 'E';
+    // add missing metadata
+    setMeta(it);
+  // return object ID
+  } return it[META].i;
+};
+var getWeak = function (it, create) {
+  if (!has(it, META)) {
+    // can't set metadata to uncaught frozen object
+    if (!isExtensible(it)) return true;
+    // not necessary to add metadata
+    if (!create) return false;
+    // add missing metadata
+    setMeta(it);
+  // return hash weak collections IDs
+  } return it[META].w;
+};
+// add metadata on freeze-family methods calling
+var onFreeze = function (it) {
+  if (FREEZE && meta.NEED && isExtensible(it) && !has(it, META)) setMeta(it);
+  return it;
+};
+var meta = module.exports = {
+  KEY: META,
+  NEED: false,
+  fastKey: fastKey,
+  getWeak: getWeak,
+  onFreeze: onFreeze
+};
+
+
+/***/ }),
+/* 38 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// 22.1.3.31 Array.prototype[@@unscopables]
+var UNSCOPABLES = __webpack_require__(8)('unscopables');
+var ArrayProto = Array.prototype;
+if (ArrayProto[UNSCOPABLES] == undefined) __webpack_require__(17)(ArrayProto, UNSCOPABLES, {});
+module.exports = function (key) {
+  ArrayProto[UNSCOPABLES][key] = true;
+};
+
+
+/***/ }),
+/* 39 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -6940,78 +7012,6 @@ process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
 };
 process.umask = function() { return 0; };
-
-
-/***/ }),
-/* 38 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var META = __webpack_require__(42)('meta');
-var isObject = __webpack_require__(5);
-var has = __webpack_require__(16);
-var setDesc = __webpack_require__(10).f;
-var id = 0;
-var isExtensible = Object.isExtensible || function () {
-  return true;
-};
-var FREEZE = !__webpack_require__(4)(function () {
-  return isExtensible(Object.preventExtensions({}));
-});
-var setMeta = function (it) {
-  setDesc(it, META, { value: {
-    i: 'O' + ++id, // object ID
-    w: {}          // weak collections IDs
-  } });
-};
-var fastKey = function (it, create) {
-  // return primitive with prefix
-  if (!isObject(it)) return typeof it == 'symbol' ? it : (typeof it == 'string' ? 'S' : 'P') + it;
-  if (!has(it, META)) {
-    // can't set metadata to uncaught frozen object
-    if (!isExtensible(it)) return 'F';
-    // not necessary to add metadata
-    if (!create) return 'E';
-    // add missing metadata
-    setMeta(it);
-  // return object ID
-  } return it[META].i;
-};
-var getWeak = function (it, create) {
-  if (!has(it, META)) {
-    // can't set metadata to uncaught frozen object
-    if (!isExtensible(it)) return true;
-    // not necessary to add metadata
-    if (!create) return false;
-    // add missing metadata
-    setMeta(it);
-  // return hash weak collections IDs
-  } return it[META].w;
-};
-// add metadata on freeze-family methods calling
-var onFreeze = function (it) {
-  if (FREEZE && meta.NEED && isExtensible(it) && !has(it, META)) setMeta(it);
-  return it;
-};
-var meta = module.exports = {
-  KEY: META,
-  NEED: false,
-  fastKey: fastKey,
-  getWeak: getWeak,
-  onFreeze: onFreeze
-};
-
-
-/***/ }),
-/* 39 */
-/***/ (function(module, exports, __webpack_require__) {
-
-// 22.1.3.31 Array.prototype[@@unscopables]
-var UNSCOPABLES = __webpack_require__(8)('unscopables');
-var ArrayProto = Array.prototype;
-if (ArrayProto[UNSCOPABLES] == undefined) __webpack_require__(17)(ArrayProto, UNSCOPABLES, {});
-module.exports = function (key) {
-  ArrayProto[UNSCOPABLES][key] = true;
-};
 
 
 /***/ }),
@@ -7551,7 +7551,7 @@ function randomBytes (size, cb) {
   return bytes
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(20), __webpack_require__(37)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(20), __webpack_require__(39)))
 
 /***/ }),
 /* 58 */
@@ -8186,7 +8186,7 @@ var global = __webpack_require__(3);
 var $export = __webpack_require__(0);
 var redefine = __webpack_require__(18);
 var redefineAll = __webpack_require__(51);
-var meta = __webpack_require__(38);
+var meta = __webpack_require__(37);
 var forOf = __webpack_require__(50);
 var anInstance = __webpack_require__(49);
 var isObject = __webpack_require__(5);
@@ -8555,7 +8555,7 @@ function nextTick(fn, arg1, arg2, arg3) {
 }
 
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(37)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(39)))
 
 /***/ }),
 /* 84 */
@@ -9362,7 +9362,7 @@ module.exports = function fill(value /* , start = 0, end = @length */) {
 
 "use strict";
 
-var addToUnscopables = __webpack_require__(39);
+var addToUnscopables = __webpack_require__(38);
 var step = __webpack_require__(144);
 var Iterators = __webpack_require__(55);
 var toIObject = __webpack_require__(21);
@@ -11339,7 +11339,7 @@ Writable.prototype._destroy = function (err, cb) {
   this.end();
   cb(err);
 };
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(37), __webpack_require__(419).setImmediate, __webpack_require__(20)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(39), __webpack_require__(419).setImmediate, __webpack_require__(20)))
 
 /***/ }),
 /* 120 */
@@ -12212,7 +12212,7 @@ var $iterDefine = __webpack_require__(100);
 var step = __webpack_require__(144);
 var setSpecies = __webpack_require__(48);
 var DESCRIPTORS = __webpack_require__(9);
-var fastKey = __webpack_require__(38).fastKey;
+var fastKey = __webpack_require__(37).fastKey;
 var validate = __webpack_require__(56);
 var SIZE = DESCRIPTORS ? '_s' : 'size';
 
@@ -12376,7 +12376,7 @@ module.exports = __webpack_require__(77)(SET, function (get) {
 
 var each = __webpack_require__(33)(0);
 var redefine = __webpack_require__(18);
-var meta = __webpack_require__(38);
+var meta = __webpack_require__(37);
 var assign = __webpack_require__(132);
 var weak = __webpack_require__(152);
 var isObject = __webpack_require__(5);
@@ -12441,7 +12441,7 @@ if (fails(function () { return new $WeakMap().set((Object.freeze || Object)(tmp)
 "use strict";
 
 var redefineAll = __webpack_require__(51);
-var getWeak = __webpack_require__(38).getWeak;
+var getWeak = __webpack_require__(37).getWeak;
 var anObject = __webpack_require__(2);
 var isObject = __webpack_require__(5);
 var anInstance = __webpack_require__(49);
@@ -14509,7 +14509,7 @@ function indexOf(xs, x) {
   }
   return -1;
 }
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(20), __webpack_require__(37)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(20), __webpack_require__(39)))
 
 /***/ }),
 /* 166 */
@@ -15349,7 +15349,7 @@ if (process.browser) {
 }
 module.exports = defaultEncoding
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(37)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(39)))
 
 /***/ }),
 /* 176 */
@@ -17710,7 +17710,7 @@ var has = __webpack_require__(16);
 var DESCRIPTORS = __webpack_require__(9);
 var $export = __webpack_require__(0);
 var redefine = __webpack_require__(18);
-var META = __webpack_require__(38).KEY;
+var META = __webpack_require__(37).KEY;
 var $fails = __webpack_require__(4);
 var shared = __webpack_require__(68);
 var setToStringTag = __webpack_require__(53);
@@ -18048,7 +18048,7 @@ __webpack_require__(32)('getOwnPropertyNames', function () {
 
 // 19.1.2.5 Object.freeze(O)
 var isObject = __webpack_require__(5);
-var meta = __webpack_require__(38).onFreeze;
+var meta = __webpack_require__(37).onFreeze;
 
 __webpack_require__(32)('freeze', function ($freeze) {
   return function freeze(it) {
@@ -18063,7 +18063,7 @@ __webpack_require__(32)('freeze', function ($freeze) {
 
 // 19.1.2.17 Object.seal(O)
 var isObject = __webpack_require__(5);
-var meta = __webpack_require__(38).onFreeze;
+var meta = __webpack_require__(37).onFreeze;
 
 __webpack_require__(32)('seal', function ($seal) {
   return function seal(it) {
@@ -18078,7 +18078,7 @@ __webpack_require__(32)('seal', function ($seal) {
 
 // 19.1.2.15 Object.preventExtensions(O)
 var isObject = __webpack_require__(5);
-var meta = __webpack_require__(38).onFreeze;
+var meta = __webpack_require__(37).onFreeze;
 
 __webpack_require__(32)('preventExtensions', function ($preventExtensions) {
   return function preventExtensions(it) {
@@ -19723,7 +19723,7 @@ var $export = __webpack_require__(0);
 
 $export($export.P, 'Array', { copyWithin: __webpack_require__(143) });
 
-__webpack_require__(39)('copyWithin');
+__webpack_require__(38)('copyWithin');
 
 
 /***/ }),
@@ -19735,7 +19735,7 @@ var $export = __webpack_require__(0);
 
 $export($export.P, 'Array', { fill: __webpack_require__(108) });
 
-__webpack_require__(39)('fill');
+__webpack_require__(38)('fill');
 
 
 /***/ }),
@@ -19756,7 +19756,7 @@ $export($export.P + $export.F * forced, 'Array', {
     return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
   }
 });
-__webpack_require__(39)(KEY);
+__webpack_require__(38)(KEY);
 
 
 /***/ }),
@@ -19777,7 +19777,7 @@ $export($export.P + $export.F * forced, 'Array', {
     return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
   }
 });
-__webpack_require__(39)(KEY);
+__webpack_require__(38)(KEY);
 
 
 /***/ }),
@@ -20808,7 +20808,7 @@ $export($export.P, 'Array', {
   }
 });
 
-__webpack_require__(39)('includes');
+__webpack_require__(38)('includes');
 
 
 /***/ }),
@@ -20837,7 +20837,7 @@ $export($export.P, 'Array', {
   }
 });
 
-__webpack_require__(39)('flatMap');
+__webpack_require__(38)('flatMap');
 
 
 /***/ }),
@@ -20865,7 +20865,7 @@ $export($export.P, 'Array', {
   }
 });
 
-__webpack_require__(39)('flatten');
+__webpack_require__(38)('flatten');
 
 
 /***/ }),
@@ -22816,10 +22816,6 @@ var _Base2 = __webpack_require__(504);
 
 var _Base3 = _interopRequireDefault(_Base2);
 
-var _Ua = __webpack_require__(505);
-
-var _Ua2 = _interopRequireDefault(_Ua);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
@@ -22997,7 +22993,6 @@ var Client = function (_Base) {
                 stringToSign = this.buildStringToSign(method, headers, signedHeadersStr, parsedUrl, originData);
 
                 headers['x-ca-signature'] = this.sign(stringToSign);
-                headers['user-agent'] = _Ua2.default;
 
                 myRequest = new Request(parsedUrl.href, {
                   method: method,
@@ -23018,16 +23013,16 @@ var Client = function (_Base) {
                     return reject(error);
                   });
                 });
-                _context.next = 15;
+                _context.next = 14;
                 return requestPromise.then(function (response) {
                   return response;
                 });
 
-              case 15:
+              case 14:
                 result = _context.sent;
                 return _context.abrupt('return', result);
 
-              case 17:
+              case 16:
               case 'end':
                 return _context.stop();
             }
@@ -25376,7 +25371,7 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
     attachTo.clearImmediate = clearImmediate;
 }(typeof self === "undefined" ? typeof global === "undefined" ? this : global : self));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(20), __webpack_require__(37)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(20), __webpack_require__(39)))
 
 /***/ }),
 /* 421 */
@@ -26023,7 +26018,7 @@ module.exports = function (password, salt, iterations, keylen, digest, callback)
   }), callback)
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(20), __webpack_require__(37)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(20), __webpack_require__(39)))
 
 /***/ }),
 /* 434 */
@@ -34516,7 +34511,7 @@ function randomFillSync (buf, offset, size) {
   return actualFill(buf, offset, size)
 }
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(20), __webpack_require__(37)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(20), __webpack_require__(39)))
 
 /***/ }),
 /* 501 */
@@ -34849,29 +34844,6 @@ var Base = function () {
 
 exports.default = Base;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7).Buffer))
-
-/***/ }),
-/* 505 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(process) {
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-var pkg = __webpack_require__(506);
-
-var ua = pkg.name + '/' + pkg.version + ' Node.js/' + process.version;
-
-exports.default = ua;
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(37)))
-
-/***/ }),
-/* 506 */
-/***/ (function(module, exports) {
-
-module.exports = {"name":"aliyun-product-js-sdk","version":"1.2.0","description":"aliyun third party product","main":"dist/aliyun-product.min.js","scripts":{"test":"cross-env BABEL_ENV=commonjs mocha --compilers js:babel-core/register --reporter spec test/*.js","clean":"rimraf library dist es","build":"npm run build:commonjs && npm run build:umd && npm run build:umd:min  && npm run build:es","prepublish":"npm run clean && npm run build","posttest":"npm run lint","lint":"eslint src test","build:commonjs":"cross-env BABEL_ENV=commonjs babel lib --out-dir library","build:es":"cross-env BABEL_ENV=es babel lib --out-dir es","build:umd":"cross-env BABEL_ENV=commonjs NODE_ENV=development webpack","build:umd:min":"cross-env BABEL_ENV=commonjs NODE_ENV=production webpack"},"repository":{"type":"git","url":"git+ssh://git@github.com/xiaohesong/aliyun-product-js-sdk.git"},"files":["lib","es","library","dist"],"keywords":["aliyun","ocr","or","other","third","party","product"],"author":"xiaohesong","license":"ISC","bugs":{"url":"https://github.com/xiaohesong/aliyun-product-js-sdk/issues"},"homepage":"https://github.com/xiaohesong/aliyun-product-js-sdk#readme","devDependencies":{"babel-core":"^6.26.0","babel-loader":"^7.1.4","babel-polyfill":"^6.26.0","babel-preset-es2015":"^6.24.1","babel-preset-stage-0":"^6.24.1","rimraf":"^2.6.2"},"dependencies":{"babel-cli":"^6.6.5","babel-plugin-transform-runtime":"^6.23.0","cross-env":"^5.1.3","webpack":"^3.8.1"}}
 
 /***/ })
 /******/ ]);
