@@ -8,12 +8,58 @@ crypto = crypto && crypto.hasOwnProperty('default') ? crypto['default'] : crypto
 uuid = uuid && uuid.hasOwnProperty('default') ? uuid['default'] : uuid;
 querystring = querystring && querystring.hasOwnProperty('default') ? querystring['default'] : querystring;
 
-function loweredKeys(headers = {}) {
-  let lowered = {};
-  let keys = Object.keys(headers);
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+  try {
+    var info = gen[key](arg);
+    var value = info.value;
+  } catch (error) {
+    reject(error);
+    return;
+  }
 
-  for (let i = 0; i < keys.length; i++) {
-    let key = keys[i];
+  if (info.done) {
+    resolve(value);
+  } else {
+    Promise.resolve(value).then(_next, _throw);
+  }
+}
+
+function _asyncToGenerator(fn) {
+  return function () {
+    var self = this,
+        args = arguments;
+    return new Promise(function (resolve, reject) {
+      var gen = fn.apply(self, args);
+
+      function _next(value) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+      }
+
+      function _throw(err) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+      }
+
+      _next(undefined);
+    });
+  };
+}
+
+function _inheritsLoose(subClass, superClass) {
+  subClass.prototype = Object.create(superClass.prototype);
+  subClass.prototype.constructor = subClass;
+  subClass.__proto__ = superClass;
+}
+
+function loweredKeys(headers) {
+  if (headers === void 0) {
+    headers = {};
+  }
+
+  var lowered = {};
+  var keys = Object.keys(headers);
+
+  for (var i = 0; i < keys.length; i++) {
+    var key = keys[i];
     lowered[key.toLowerCase()] = headers[key];
   }
 
@@ -24,10 +70,20 @@ function loweredKeys(headers = {}) {
  */
 
 
-class Base {
-  get(url$1, opts = {}) {
-    let parsed = url.parse(url$1, true);
-    let maybeQuery = opts.query || opts.data;
+var Base =
+/*#__PURE__*/
+function () {
+  function Base() {}
+
+  var _proto = Base.prototype;
+
+  _proto.get = function get(url$1, opts) {
+    if (opts === void 0) {
+      opts = {};
+    }
+
+    var parsed = url.parse(url$1, true);
+    var maybeQuery = opts.query || opts.data;
 
     if (maybeQuery) {
       // append data into querystring
@@ -41,11 +97,15 @@ class Base {
     opts.headers = loweredKeys(opts.headers);
     opts.signHeaders = loweredKeys(opts.signHeaders);
     return this.request('GET', parsed, opts);
-  }
+  };
 
-  post(url$1, opts = {}) {
-    let parsed = url.parse(url$1, true);
-    let query = opts.query;
+  _proto.post = function post(url$1, opts) {
+    if (opts === void 0) {
+      opts = {};
+    }
+
+    var parsed = url.parse(url$1, true);
+    var query = opts.query;
 
     if (query) {
       // append data into querystring
@@ -57,15 +117,15 @@ class Base {
 
     opts.headers = loweredKeys(opts.headers);
     opts.signHeaders = loweredKeys(opts.signHeaders);
-    let headers = opts.headers;
-    let type = headers['content-type'] || headers['Content-Type'];
+    var headers = opts.headers;
+    var type = headers['content-type'] || headers['Content-Type'];
 
     if (!type) {
       headers['content-type'] = 'application/json';
       type = headers['content-type'];
     }
 
-    let originData = opts.data;
+    var originData = opts.data;
 
     if (type.startsWith('application/x-www-form-urlencoded')) {
       opts.data = querystring.stringify(opts.data);
@@ -77,11 +137,15 @@ class Base {
     }
 
     return this.request('POST', parsed, opts, originData);
-  }
+  };
 
-  put(url$1, opts = {}) {
-    let parsed = url.parse(url$1, true);
-    let query = opts.query;
+  _proto.put = function put(url$1, opts) {
+    if (opts === void 0) {
+      opts = {};
+    }
+
+    var parsed = url.parse(url$1, true);
+    var query = opts.query;
 
     if (query) {
       // append data into querystring
@@ -93,15 +157,15 @@ class Base {
 
     opts.headers = loweredKeys(opts.headers);
     opts.signHeaders = loweredKeys(opts.signHeaders);
-    let headers = opts.headers;
-    let type = headers['content-type'] || headers['Content-Type'];
+    var headers = opts.headers;
+    var type = headers['content-type'] || headers['Content-Type'];
 
     if (!type) {
       headers['content-type'] = 'application/json';
       type = headers['content-type'];
     }
 
-    let originData = opts.data;
+    var originData = opts.data;
 
     if (type.startsWith('application/x-www-form-urlencoded')) {
       opts.data = querystring.stringify(opts.data);
@@ -113,11 +177,11 @@ class Base {
     }
 
     return this.request('PUT', parsed, opts, originData);
-  }
+  };
 
-  delete(url$1, opts) {
-    let parsed = url.parse(url$1, true);
-    let maybeQuery = opts.query || opts.data;
+  _proto.delete = function _delete(url$1, opts) {
+    var parsed = url.parse(url$1, true);
+    var maybeQuery = opts.query || opts.data;
 
     if (maybeQuery) {
       // append data into querystring
@@ -131,13 +195,14 @@ class Base {
     opts.headers = loweredKeys(opts.headers);
     opts.signHeaders = loweredKeys(opts.signHeaders);
     return this.request('DELETE', parsed, opts);
-  }
+  };
 
-}
+  return Base;
+}();
 
-const form = 'application/x-www-form-urlencoded';
+var form = 'application/x-www-form-urlencoded';
 
-const hasOwnProperty = function (obj, key) {
+var hasOwnProperty = function hasOwnProperty(obj, key) {
   return Object.prototype.hasOwnProperty.call(obj, key);
 };
 /**
@@ -145,40 +210,53 @@ const hasOwnProperty = function (obj, key) {
  */
 
 
-class Client extends Base {
-  constructor(key, secret, stage = 'RELEASE') {
-    super();
-    this.appKey = key;
-    this.appSecret = Buffer.from(secret, 'utf8');
-    this.stage = stage;
+var Client =
+/*#__PURE__*/
+function (_Base) {
+  _inheritsLoose(Client, _Base);
+
+  function Client(key, secret, stage) {
+    var _this;
+
+    if (stage === void 0) {
+      stage = 'RELEASE';
+    }
+
+    _this = _Base.call(this) || this;
+    _this.appKey = key;
+    _this.appSecret = Buffer.from(secret, 'utf8');
+    _this.stage = stage;
+    return _this;
   }
 
-  buildStringToSign(method, headers, signedHeadersStr, url, data) {
+  var _proto = Client.prototype;
+
+  _proto.buildStringToSign = function buildStringToSign(method, headers, signedHeadersStr, url, data) {
     // accept, contentMD5, contentType,
-    const lf = '\n';
-    let list = [method, lf];
-    let accept = headers['accept'];
+    var lf = '\n';
+    var list = [method, lf];
+    var accept = headers['accept'];
 
     if (accept) {
       list.push(accept);
     }
 
     list.push(lf);
-    let contentMD5 = headers['content-md5'];
+    var contentMD5 = headers['content-md5'];
 
     if (contentMD5) {
       list.push(contentMD5);
     }
 
     list.push(lf);
-    let contentType = headers['content-type'] || '';
+    var contentType = headers['content-type'] || '';
 
     if (contentType) {
       list.push(contentType);
     }
 
     list.push(lf);
-    let date = headers['date'];
+    var date = headers['date'];
 
     if (date) {
       list.push(date);
@@ -198,22 +276,22 @@ class Client extends Base {
     }
 
     return list.join('');
-  }
+  };
 
-  sign(stringToSign) {
+  _proto.sign = function sign(stringToSign) {
     return crypto.createHmac('sha256', this.appSecret).update(stringToSign, 'utf8').digest('base64');
-  }
+  };
 
-  md5(content) {
+  _proto.md5 = function md5(content) {
     return crypto.createHash('md5').update(content, 'utf8').digest('base64');
-  }
+  };
 
-  getSignHeaderKeys(headers, signHeaders) {
-    let keys = Object.keys(headers).sort();
-    let signKeys = [];
+  _proto.getSignHeaderKeys = function getSignHeaderKeys(headers, signHeaders) {
+    var keys = Object.keys(headers).sort();
+    var signKeys = [];
 
-    for (let i = 0; i < keys.length; i++) {
-      let key = keys[i]; // x-ca- 开头的header或者指定的header
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i]; // x-ca- 开头的header或者指定的header
 
       if (key.startsWith('x-ca-') || hasOwnProperty(signHeaders, key)) {
         signKeys.push(key);
@@ -222,23 +300,23 @@ class Client extends Base {
 
 
     return signKeys.sort();
-  }
+  };
 
-  buildUrl(parsedUrl, data) {
-    let toStringify = Object.assign(parsedUrl.query, data);
-    let result = parsedUrl.pathname;
+  _proto.buildUrl = function buildUrl(parsedUrl, data) {
+    var toStringify = Object.assign(parsedUrl.query, data);
+    var result = parsedUrl.pathname;
 
     if (Object.keys(toStringify).length) {
-      let keys = Object.keys(toStringify).sort();
-      let list = new Array(keys.length);
+      var keys = Object.keys(toStringify).sort();
+      var list = new Array(keys.length);
 
-      for (let i = 0; i < keys.length; i++) {
-        let key = keys[i];
+      for (var i = 0; i < keys.length; i++) {
+        var key = keys[i];
 
         if (toStringify[key] && '' + toStringify[key]) {
-          list[i] = `${key}=${toStringify[key]}`;
+          list[i] = key + "=" + toStringify[key];
         } else {
-          list[i] = `${key}`;
+          list[i] = "" + key;
         }
       }
 
@@ -246,9 +324,13 @@ class Client extends Base {
     }
 
     return result;
-  }
+  };
 
-  buildHeaders(headers = {}, signHeaders) {
+  _proto.buildHeaders = function buildHeaders(headers, signHeaders) {
+    if (headers === void 0) {
+      headers = {};
+    }
+
     return Object.assign({
       'x-ca-timestamp': Date.now(),
       'x-ca-key': this.appKey,
@@ -256,55 +338,90 @@ class Client extends Base {
       'x-ca-stage': this.stage,
       'accept': 'application/json'
     }, headers, signHeaders);
-  }
+  };
 
-  getSignedHeadersString(signHeaders, headers) {
-    let list = [];
+  _proto.getSignedHeadersString = function getSignedHeadersString(signHeaders, headers) {
+    var list = [];
 
-    for (let i = 0; i < signHeaders.length; i++) {
-      let key = signHeaders[i];
+    for (var i = 0; i < signHeaders.length; i++) {
+      var key = signHeaders[i];
       list.push(key + ':' + headers[key]);
     }
 
     return list.join('\n');
-  }
+  };
 
-  async request(method, url$1, opts, originData) {
-    let signHeaders = opts.signHeaders; // 小写化，合并之后的headers
+  _proto.request =
+  /*#__PURE__*/
+  function () {
+    var _request = _asyncToGenerator(
+    /*#__PURE__*/
+    regeneratorRuntime.mark(function _callee(method, url$1, opts, originData) {
+      var signHeaders, headers, requestContentType, signHeaderKeys, signedHeadersStr, parsedUrl, stringToSign, myRequest, requestPromise, result;
+      return regeneratorRuntime.wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              signHeaders = opts.signHeaders; // 小写化，合并之后的headers
 
-    let headers = this.buildHeaders(opts.headers, signHeaders);
-    let requestContentType = headers['content-type'] || '';
+              headers = this.buildHeaders(opts.headers, signHeaders);
+              requestContentType = headers['content-type'] || '';
 
-    if (method === 'POST' && !requestContentType.startsWith(form)) {
-      headers['content-md5'] = this.md5(opts.data);
+              if (method === 'POST' && !requestContentType.startsWith(form)) {
+                headers['content-md5'] = this.md5(opts.data);
+              }
+
+              signHeaderKeys = this.getSignHeaderKeys(headers, signHeaders);
+              headers['x-ca-signature-headers'] = signHeaderKeys.join(',');
+              signedHeadersStr = this.getSignedHeadersString(signHeaderKeys, headers);
+              parsedUrl = url.parse(url$1, true);
+              stringToSign = this.buildStringToSign(method, headers, signedHeadersStr, parsedUrl, originData);
+              headers['x-ca-signature'] = this.sign(stringToSign);
+              myRequest = new Request(parsedUrl.href, {
+                method: method,
+                body: opts.data,
+                headers: headers
+              });
+              requestPromise = new Promise(function (resolve, reject) {
+                fetch(myRequest).then(function (res) {
+                  if (res.status !== 200) {
+                    var errors = res.status + ", " + res.statusText;
+                    throw errors;
+                  } else {
+                    return res.json();
+                  }
+                }).then(function (data) {
+                  return resolve(data);
+                }).catch(function (error) {
+                  return reject(error);
+                });
+              });
+              _context.next = 14;
+              return requestPromise.then(function (response) {
+                return response;
+              });
+
+            case 14:
+              result = _context.sent;
+              return _context.abrupt("return", result);
+
+            case 16:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee, this);
+    }));
+
+    function request(_x, _x2, _x3, _x4) {
+      return _request.apply(this, arguments);
     }
 
-    let signHeaderKeys = this.getSignHeaderKeys(headers, signHeaders);
-    headers['x-ca-signature-headers'] = signHeaderKeys.join(',');
-    let signedHeadersStr = this.getSignedHeadersString(signHeaderKeys, headers);
-    let parsedUrl = url.parse(url$1, true);
-    let stringToSign = this.buildStringToSign(method, headers, signedHeadersStr, parsedUrl, originData);
-    headers['x-ca-signature'] = this.sign(stringToSign);
-    const myRequest = new Request(parsedUrl.href, {
-      method: method,
-      body: opts.data,
-      headers: headers
-    });
-    const requestPromise = new Promise((resolve, reject) => {
-      fetch(myRequest).then(res => {
-        if (res.status !== 200) {
-          let errors = `${res.status}, ${res.statusText}`;
-          throw errors;
-        } else {
-          return res.json();
-        }
-      }).then(data => resolve(data)).catch(error => reject(error));
-    });
-    const result = await requestPromise.then(response => response);
-    return result;
-  }
+    return request;
+  }();
 
-}
+  return Client;
+}(Base);
 
 return Client;
 
