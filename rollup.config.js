@@ -1,6 +1,5 @@
 import nodeResolve from 'rollup-plugin-node-resolve'
 import babel from 'rollup-plugin-babel'
-import replace from 'rollup-plugin-replace'
 import { terser } from 'rollup-plugin-terser'
 
 import pkg from './package.json'
@@ -9,7 +8,7 @@ export default [
   // CommonJS
   {
     input: './index.js',
-    output: { file: 'lib/aliyun-product-js-sdk.js', format: 'cjs', indent: false },
+    output: { file: 'library/aliyun-product.js', format: 'cjs', indent: false },
     external: [
       ...Object.keys(pkg.dependencies || {}),
       ...Object.keys(pkg.peerDependencies || {})
@@ -20,7 +19,7 @@ export default [
   // ES
   {
     input: './index.js',
-    output: { file: 'es/aliyun-product-js-sdk.js', format: 'es', indent: false },
+    output: { file: 'es/aliyun-product.js', format: 'es', indent: false },
     external: [
       ...Object.keys(pkg.dependencies || {}),
       ...Object.keys(pkg.peerDependencies || {})
@@ -31,10 +30,18 @@ export default [
   // ES for Browsers
   {
     input: './index.js',
-    output: { file: 'es/aliyun-product-js-sdk.mjs', format: 'es', indent: false },
+    output: { file: 'es/aliyun-product.mjs', format: 'es', indent: false },
     plugins: [
       nodeResolve({
         jsnext: true
+      }),
+      terser({
+        compress: {
+          pure_getters: true,
+          unsafe: true,
+          unsafe_comps: true,
+          warnings: false
+        }
       })
     ]
   },
@@ -43,7 +50,7 @@ export default [
   {
     input: './index.js',
     output: {
-      file: 'dist/aliyun-product-js-sdk.js',
+      file: 'dist/aliyun-product.js',
       format: 'umd',
       name: 'AliyunOssProSdk',
       indent: false
@@ -59,7 +66,7 @@ export default [
   {
     input: './index.js',
     output: {
-      file: 'dist/aliyun-product-js-sdk.min.js',
+      file: 'dist/aliyun-product.min.js',
       format: 'umd',
       name: 'AliyunOssProSdk',
       indent: false
@@ -70,6 +77,14 @@ export default [
       }),
       babel({
         exclude: 'node_modules/**'
+      }),
+      terser({
+        compress: {
+          pure_getters: true,
+          unsafe: true,
+          unsafe_comps: true,
+          warnings: false
+        }
       })
     ]
   }
