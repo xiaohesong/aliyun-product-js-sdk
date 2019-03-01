@@ -1,6 +1,7 @@
 import nodeResolve from 'rollup-plugin-node-resolve'
 import babel from 'rollup-plugin-babel'
 import { terser } from 'rollup-plugin-terser'
+import commonjs from 'rollup-plugin-commonjs'
 
 import pkg from './package.json'
 
@@ -13,7 +14,14 @@ export default [
       ...Object.keys(pkg.dependencies || {}),
       ...Object.keys(pkg.peerDependencies || {})
     ],
-    plugins: [babel()]
+    plugins: [
+      babel({
+        runtimeHelpers: true
+      }),
+      commonjs({
+        include: 'node_modules/**'
+      }),
+    ]
   },
 
   // ES
@@ -24,7 +32,15 @@ export default [
       ...Object.keys(pkg.dependencies || {}),
       ...Object.keys(pkg.peerDependencies || {})
     ],
-    plugins: [babel()]
+    plugins: [
+      babel({
+        exclude: 'node_modules/**',
+        runtimeHelpers: true
+      }),
+      commonjs({
+        include: 'node_modules/**'
+      })
+    ]
   },
 
   // ES for Browsers
@@ -42,25 +58,29 @@ export default [
           unsafe_comps: true,
           warnings: false
         }
-      })
+      }),
+      commonjs({
+        include: 'node_modules/**'
+      }),
     ]
   },
 
   // UMD Development
-  {
-    input: './index.js',
-    output: {
-      file: 'dist/aliyun-product.js',
-      format: 'umd',
-      name: 'AliyunOssProSdk',
-      indent: false
-    },
-    plugins: [
-      babel({
-        exclude: 'node_modules/**'
-      })
-    ]
-  },
+  // {
+  //   input: './index.js',
+  //   output: {
+  //     file: 'dist/aliyun-product.js',
+  //     format: 'umd',
+  //     name: 'AliyunOssProSdk',
+  //     indent: false
+  //   },
+  //   plugins: [
+  //     babel({
+  //       exclude: 'node_modules/**',
+  //       runtimeHelpers: true
+  //     })
+  //   ]
+  // },
 
   // UMD Production
   {
@@ -76,7 +96,8 @@ export default [
         jsnext: true
       }),
       babel({
-        exclude: 'node_modules/**'
+        exclude: 'node_modules/**',
+        runtimeHelpers: true
       }),
       terser({
         compress: {
@@ -85,7 +106,10 @@ export default [
           unsafe_comps: true,
           warnings: false
         }
-      })
+      }),
+      commonjs({
+        include: 'node_modules/**'
+      }),
     ]
   }
 ]
